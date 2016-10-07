@@ -2,9 +2,10 @@
 
 import smtplib
 import os.path
+from multiprocessing import Pool
 
 """
-Short script for sending email from python. It was created to notify
+Tool for sending email from python. It was created to notify
 (hence, notipy :) me when a job was completed (along with any relevant results)
 Compatible with both python2 and python3
 """
@@ -31,14 +32,11 @@ def readSendDetails():
     # file containing email and password that is NOT tracked by Git.
     if os.path.isfile("sendDetails1.txt"):
         fin = open("sendDetails1.txt")
-
     elif os.path.isfile("sendDetails.txt"):
         fin = open("sendDetails.txt")
-
     else:
         print("You must provide a sendDetails.txt/sendDetails1.txt file")
         print("See BitBucket for file format details.")
-
 
     for line in fin:
         lineSplit = line.rstrip().split(":")
@@ -56,7 +54,7 @@ def readSendDetails():
 
 
 
-def sendMail(toAddress, message, subject="NB AutoMail"):
+def sendMail(toAddress, message, subject="Notipy AutoMail"):
 
     if isinstance(toAddress, str):   #smtolib expects the toAddress to be a string
         toAddress = [x.strip() for x in toAddress.split(",")]
@@ -87,9 +85,13 @@ def sendMail(toAddress, message, subject="NB AutoMail"):
 
     return 0
 
+sendStatus = []
+def callbackR(result):
+    sendStatus.append(result)
 
-# Feature ToDo list
-# Secure local password storage
-# More robust error checking and handling
-# Error log to preserve any encountered issues (such as server down time after hours)
-# Asynchronous send
+def sendMailAsync(toAddress, message, subject = ""):
+    args = [toAddress, message]
+    if (subject != ""):
+        args.append(subject)
+    pool = Pool()
+    pool.apply_async(sendMail, args, callback=callbackR)
