@@ -3,6 +3,7 @@
 import smtplib
 import os.path
 from multiprocessing import Pool
+import logging
 
 """
 Tool for sending email from python. It was created to notify
@@ -35,8 +36,9 @@ def readSendDetails():
     elif os.path.isfile("sendDetails.txt"):
         fin = open("sendDetails.txt")
     else:
-        print("You must provide a sendDetails.txt/sendDetails1.txt file")
-        print("See BitBucket for file format details.")
+        msg = "You must provide a sendDetails.txt/sendDetails1.txt file\nSee GitHub Readme for file format details."
+        logging.debug(msg)
+
 
     for line in fin:
         lineSplit = line.rstrip().split(":")
@@ -62,8 +64,7 @@ def sendMail(toAddress, message, subject="Notipy AutoMail"):
     try:
         send_details = readSendDetails()
     except Exception as e:
-        print ("ERROR: The sendDetails.txt/sendDetails1.txt file must contain a key and value for key: ")
-        print (e)
+        logging.debug("ERROR: The sendDetails.txt/sendDetails1.txt file must contain a key and value for key: \n" + str(e))
         return -1
 
     SERVER = send_details["server"]
@@ -83,11 +84,10 @@ def sendMail(toAddress, message, subject="Notipy AutoMail"):
     server.sendmail(FROM, toAddress, fullMessage)
     server.quit()
 
-    return 0
-
-sendStatus = []
+    return "Successfully seny mail to " + str(toAddress) + " with message beginning: " + message[0:min(20,len(message))]
+    
 def callbackR(result):
-    sendStatus.append(result)
+    logging.info(result)
 
 def sendMailAsync(toAddress, message, subject = ""):
     args = [toAddress, message]
@@ -95,3 +95,6 @@ def sendMailAsync(toAddress, message, subject = ""):
         args.append(subject)
     pool = Pool()
     pool.apply_async(sendMail, args, callback=callbackR)
+    
+    
+logging.basicConfig(filename="notipyLog.txt", level=logging.DEBUG)
