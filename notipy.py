@@ -24,7 +24,12 @@ Compatible with both python2 and python3
 #notipy.sendMail("to@address.com", "This is a message")
 
 
-def readSendDetails():
+# Constants
+numMessageCharInLogEntry = 40
+defaultSubject = "Notipy Automail"
+logFileName = "notipy.log"
+
+def _readSendDetails():
     required_keywords = ["email", "password", "server", "port"]
     # send_details = {"email": "", "password": "", "server": "", "port": ""}
     send_details = {}
@@ -54,47 +59,60 @@ def readSendDetails():
 
     return send_details
 
-
-
-def sendMail(toAddress, message, subject="Notipy AutoMail"):
-
+def _formatAndSendMail(toAddress, message, subject=defaultSubject):
+    statusStr= ""
+    logCode = logging.INFO
     if isinstance(toAddress, str):   #smtolib expects the toAddress to be a string
         toAddress = [x.strip() for x in toAddress.split(",")]
 
     try:
-        send_details = readSendDetails()
+        send_details = _readSendDetails()
     except Exception as e:
-        logging.debug("ERROR: The sendDetails.txt/sendDetails1.txt file must contain a key and value for key: \n" + str(e))
-        return -1
+        statusStr = "ERROR: The sendDetails.txt/sendDetails1.txt file must contain a key and value for key: \n" + str(e)
+        logCode = logging.DEBUG
+    else:
+        SERVER = send_details["server"]
+        PORT = send_details["port"]
+        FROM = send_details["email"]
+        PWD = send_details["password"]
 
-    SERVER = send_details["server"]
-    PORT = send_details["port"]
-    FROM = send_details["email"]
-    PWD = send_details["password"]
+        fullMessage = """From: %s\r\nTo: %s\r\nSubject: %s\r\n\
 
-    fullMessage = """From: %s\r\nTo: %s\r\nSubject: %s\r\n\
+        %s
+        """ % (FROM, ", ".join(toAddress), subject, message )
 
-    %s
-    """ % (FROM, ", ".join(toAddress), subject, message )
+        server = smtplib.SMTP(SERVER, PORT)
+        server.starttls()
+        server.login(FROM, PWD)
+        server.sendmail(FROM, toAddress, fullMessage)
+        server.quit()
 
-    server = smtplib.SMTP(SERVER, PORT)
-    server.starttls()
-    server.login(FROM, PWD)
-
-    server.sendmail(FROM, toAddress, fullMessage)
-    server.quit()
-
-    return "Successfully seny mail to " + str(toAddress) + " with message beginning: " + message[0:min(20,len(message))]
+        statusStr = "Successfully sent mail to " + str(toAddress) + " with message: " + message[:min(numMessageCharInLogEntry,len(message))] + "..."
     
-def callbackR(result):
-    logging.info(result)
+    return (statusStr, logCode)
+
+def _logSend(result):
+    message, logLevel = result
+    
+    if logLevel == logging.INFO:
+        logging.info(message)
+    elif logLevel == logging.DEBUG:
+        logging.debug(message)
+
+def sendMail(toAddress, message, subject = ""):
+    if (subject != ""):
+        status = _formatAndSendMail(toAddress, message, subject)
+    else:
+        status = _formatAndSendMail(toAddress, message)
+    _logSend(status)
 
 def sendMailAsync(toAddress, message, subject = ""):
     args = [toAddress, message]
     if (subject != ""):
         args.append(subject)
     pool = Pool()
-    pool.apply_async(sendMail, args, callback=callbackR)
-    
-    
-logging.basicConfig(filename="notipyLog.txt", level=logging.DEBUG)
+    pool.apply_async(_formatAndSendMail, args, callback=_logSend)
+
+
+# Run when notipy is imported
+logging.basicConfig(filename=logFileName, level=logging.DEBUG, format='%(asctime)-15s %(levelname)-8s %(message)s')
