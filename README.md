@@ -1,3 +1,4 @@
+![notipy logo](https://raw.githubusercontent.com/nbryans/notipy/Logo/notipyLogo.png)
 # notipy
 A module for quickly sending email alerts from python code.
 
@@ -29,4 +30,10 @@ Use `sendMailAsync(..)` to send mail in the background without blocking the send
 
 Send statuses are logged in `notipy.log`. The file written to can be changed in the `#Constants` section of `notipy.py`
 
-In `sendMail` and `sendMailAsync`, there is an optional third parameter where you can specify a subject. i.e. `notipy.sendMail("to@address.com", "This is the message", "Custom Subject")`. The default subject is `Notipy Automail`"
+In `sendMail` and `sendMailAsync`, there is an optional third parameter where you can specify a subject. *i.e.* `notipy.sendMail("to@address.com", "This is the message", "Custom Subject")`. The default subject is "Notipy Automail"
+
+<!---
+Logo created using modified images originally distributed by Pixabay.com
+https://pixabay.com/en/cartoon-snake-yellow-1293047/
+https://pixabay.com/en/email-letter-contact-message-mail-309678/
+-->
