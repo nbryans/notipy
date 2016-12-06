@@ -1,5 +1,5 @@
-![notipy logo](https://raw.githubusercontent.com/nbryans/notipy/Logo/notipyLogo.png)
-# notipy
+<img src=https://github.com/nbryans/notipy/blob/master/Logo/notipyLogo.png width=300px align=left>
+<!---# notipy-->
 A module for quickly sending email alerts from python code.
 
 
