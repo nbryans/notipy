@@ -23,8 +23,10 @@ notipy.sendMail("to@address.com", "This is a message")
 ```
 
 ### Notes
-`sendDetails1.txt` is include in `.gitignore` so that it doesn't sync.
+`sendDetails1.txt` is included in `.gitignore` to keep your details off GitHub.
 
 Use `sendMailAsync(..)` to send mail in the background without blocking the sending process.
 
 Send statuses are logged in `notipy.log`. The file written to can be changed in the `#Constants` section of `notipy.py`
+
+In `sendMail` and `sendMailAsync`, there is an optional third parameter where you can specify a subject. i.e. `notipy.sendMail("to@address.com", "This is the message", "Custom Subject")`. The default subject is `Notipy Automail`"
