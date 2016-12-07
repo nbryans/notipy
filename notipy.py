@@ -2,8 +2,9 @@
 
 import smtplib
 import os.path
-from multiprocessing import Pool
 import logging
+from multiprocessing import Pool
+from collections import deque
 
 """
 Tool for sending email from python. It was created to notify
@@ -29,21 +30,22 @@ numMessageCharInLogEntry = 40
 defaultSubject = "Notipy Automail"
 logFileName = "notipy.log"
 
+class MissingValueException(Exception):
+    pass
+
+class MissingConfigFileException(Exception):
+    pass
+
 def _readSendDetails():
     required_keywords = ["email", "password", "server", "port"]
-    # send_details = {"email": "", "password": "", "server": "", "port": ""}
     send_details = {}
 
-    # Always check for sendDetails1.txt. This is so the user can have a
-    # file containing email and password that is NOT tracked by Git.
+    # Check for sendDetails1.txt. This is included in the .gitignore
+    # file containing so it is NOT tracked by Git.
     if os.path.isfile("sendDetails1.txt"):
         fin = open("sendDetails1.txt")
-    elif os.path.isfile("sendDetails.txt"):
-        fin = open("sendDetails.txt")
     else:
-        msg = "You must provide a sendDetails.txt/sendDetails1.txt file\nSee GitHub Readme for file format details."
-        logging.debug(msg)
-
+        raise MissingConfigFileException()
 
     for line in fin:
         lineSplit = line.rstrip().split(":")
@@ -53,10 +55,9 @@ def _readSendDetails():
     for i in required_keywords:
         if i in send_details.keys():
             if not send_details[i]:
-                raise Exception([i])
+                raise MissingValueException(i)
         else:
-            raise Exception(i)
-
+            raise MissingValueException(i)
     return send_details
 
 def _formatAndSendMail(toAddress, message, subject=defaultSubject):
@@ -67,9 +68,12 @@ def _formatAndSendMail(toAddress, message, subject=defaultSubject):
 
     try:
         send_details = _readSendDetails()
-    except Exception as e:
-        statusStr = "ERROR: The sendDetails.txt/sendDetails1.txt file must contain a key and value for key: \n" + str(e)
-        logCode = logging.DEBUG
+    except MissingValueException as e:
+        statusStr = "The sendDetails.txt/sendDetails1.txt file must contain a key and value for key: " + str(e) + " ."
+        logCode = logging.ERROR
+    except MissingConfigFileException as e:
+        statusStr = "You must provide a sendDetails1.txt file. See GitHub Readme for file format details."
+        logCode = logging.ERROR
     else:
         SERVER = send_details["server"]
         PORT = send_details["port"]
@@ -93,11 +97,10 @@ def _formatAndSendMail(toAddress, message, subject=defaultSubject):
 
 def _logSend(result):
     message, logLevel = result
-    
     if logLevel == logging.INFO:
         logging.info(message)
-    elif logLevel == logging.DEBUG:
-        logging.debug(message)
+    elif logLevel == logging.ERROR:
+        logging.error(message)
 
 def sendMail(toAddress, message, subject = ""):
     if (subject != ""):
@@ -113,6 +116,12 @@ def sendMailAsync(toAddress, message, subject = ""):
     pool = Pool()
     pool.apply_async(_formatAndSendMail, args, callback=_logSend)
 
+def queryLogs(numEntry, logFile=None):
+    if not logFile:
+        logFile = logFileName
+    with open(logFile) as fin:
+        for i in deque(fin, maxlen=numEntry):
+            print(i)
 
 # Run when notipy is imported
 logging.basicConfig(filename=logFileName, level=logging.DEBUG, format='%(asctime)-15s %(levelname)-8s %(message)s')
