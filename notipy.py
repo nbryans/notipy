@@ -85,14 +85,18 @@ def _formatAndSendMail(toAddress, message, subject=defaultSubject):
         %s
         """ % (FROM, ", ".join(toAddress), subject, message )
 
-        server = smtplib.SMTP(SERVER, PORT)
-        server.starttls()
-        server.login(FROM, PWD)
-        server.sendmail(FROM, toAddress, fullMessage)
-        server.quit()
+        try:
+            server = smtplib.SMTP(SERVER, PORT)
+            server.starttls()
+            server.login(FROM, PWD)
+            server.sendmail(FROM, toAddress, fullMessage)
+            server.quit()
+        except smtplib.SMTPException as e:
+            statusStr = "SMTPException caught: " + str(e)
+            logCode = logging.ERROR
+        else:
+            statusStr = "Successfully sent mail to " + str(toAddress) + " with message: " + message[:min(numMessageCharInLogEntry,len(message))] + "..."
 
-        statusStr = "Successfully sent mail to " + str(toAddress) + " with message: " + message[:min(numMessageCharInLogEntry,len(message))] + "..."
-    
     return (statusStr, logCode)
 
 def _logSend(result):
@@ -116,7 +120,7 @@ def sendMailAsync(toAddress, message, subject = ""):
     pool = Pool()
     pool.apply_async(_formatAndSendMail, args, callback=_logSend)
 
-def queryLogs(numEntry, logFile=None):
+def queryLog(numEntry, logFile=None):
     if not logFile:
         logFile = logFileName
     with open(logFile) as fin:
