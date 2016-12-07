@@ -29,6 +29,7 @@ Compatible with both python2 and python3
 numMessageCharInLogEntry = 40
 defaultSubject = "Notipy Automail"
 logFileName = "notipy.log"
+detailsFileName = "sendDetails1.txt"
 
 class MissingValueException(Exception):
     pass
@@ -36,14 +37,15 @@ class MissingValueException(Exception):
 class MissingConfigFileException(Exception):
     pass
 
+required_keywords = ["email", "password", "server", "port"]
+
 def _readSendDetails():
-    required_keywords = ["email", "password", "server", "port"]
     send_details = {}
 
     # Check for sendDetails1.txt. This is included in the .gitignore
     # file containing so it is NOT tracked by Git.
-    if os.path.isfile("sendDetails1.txt"):
-        fin = open("sendDetails1.txt")
+    if os.path.isfile(detailsFileName):
+        fin = open(detailsFileName)
     else:
         raise MissingConfigFileException()
 
@@ -69,7 +71,7 @@ def _formatAndSendMail(toAddress, message, subject=defaultSubject):
     try:
         send_details = _readSendDetails()
     except MissingValueException as e:
-        statusStr = "The sendDetails.txt/sendDetails1.txt file must contain a key and value for key: " + str(e) + " ."
+        statusStr = "The sendDetails1.txt file must contain a key and value for key: " + str(e) + " ."
         logCode = logging.ERROR
     except MissingConfigFileException as e:
         statusStr = "You must provide a sendDetails1.txt file. See GitHub Readme for file format details."
@@ -126,6 +128,21 @@ def queryLog(numEntry, logFile=None):
     with open(logFile) as fin:
         for i in deque(fin, maxlen=numEntry):
             print(i)
+
+def updateSendDetails(uEmail, uPassword, uServer, uPort):
+    fout = open(detailsFileName, "w")
+    for i in required_keywords:
+        value = ""
+        if i == "email":
+            value = uEmail
+        elif i == "password":
+            value = uPassword
+        elif i == "server":
+            value = uServer
+        elif i == "port":
+            value = uPort
+        fout.write('{0}:{1}\n'.format(i, value))
+    fout.close()
 
 # Run when notipy is imported
 logging.basicConfig(filename=logFileName, level=logging.DEBUG, format='%(asctime)-15s %(levelname)-8s %(message)s')
