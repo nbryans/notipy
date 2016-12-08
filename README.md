@@ -1,34 +1,44 @@
 <img src=https://github.com/nbryans/notipy/blob/master/Logo/notipyLogo.png width=300px align=left>
 <!---# notipy-->
-A module for quickly sending email alerts from python code.
+A module for quickly sending email alerts and statuses from python programs
 
 
-This script was created to notify (hence, notipy :) me when a job was completed (and possibly send exit status and results)
+This script was created to notify (hence, notipy :) me when a job was completed (and include an exit status and results, if desired)
 
 
-Compatible with both python2 and python3
+Notipy is compatible with both python2 and python3
 
-
+<br />
 # Instructions
-Create file  `sendDetails1.txt` containing the following contents (see template sendDetails.txt as an example)
+
+### On First Run
+```
+import notipy
+notipy.updateSendDetails("yourEmail@server.com", "yourPassword", "smtp.yourServer.com", "587")
+```
+This will create file  `sendDetails1.txt` containing the following contents:
 ```
 email:nbauto791@gmail.com
 password:<redacted>
 server:smtp.gmail.com
 port:587
 ```
-To run:
+Optionally, you can `cp sendDetails.txt sendDetails1.txt` and fill out manually.
+
+###Sending Emails with Notipy:
 ```
 import notipy
 notipy.sendMail("to@address.com", "This is a message")
 ```
 
-### Notes
-`sendDetails1.txt` is included in `.gitignore` to keep your details off GitHub.
+# Notes
+`sendDetails1.txt` is included in `.gitignore` to keep your email details off GitHub.
 
-Use `sendMailAsync(..)` to send mail in the background without blocking the sending process.
+Use `notipy.sendMailAsync(..)` to send mail in the background asynchronously.
 
-Send statuses are logged in `notipy.log`. The file written to can be changed in the `#Constants` section of `notipy.py`
+Send statuses are logged in `notipy.log`. The file to write the log to to can be changed in the `#Constants` section of `notipy.py`
+
+To query the log through python, use `notipy.queryLog(5)` where the argument specifies the number of most recent log entries to retrieve. This operation may be slow for large logs.
 
 In `sendMail` and `sendMailAsync`, there is an optional third parameter where you can specify a subject. *i.e.* `notipy.sendMail("to@address.com", "This is the message", "Custom Subject")`. The default subject is "Notipy Automail"
 
