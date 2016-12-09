@@ -4,7 +4,7 @@ import smtplib
 import os.path
 import logging
 from multiprocessing import Pool
-from collections import deque
+from collections import deque, namedtuple
 
 """
 Tool for sending email from python. It was created to notify
@@ -99,10 +99,11 @@ def _formatAndSendMail(toAddress, message, subject=defaultSubject):
         else:
             statusStr = "Successfully sent mail to " + str(toAddress) + " with message: " + message[:min(numMessageCharInLogEntry,len(message))] + "..."
 
-    return (statusStr, logCode)
+    return logEntry(level=logCode, msg=statusStr)
 
 def _logSend(result):
-    message, logLevel = result
+    message = result.msg
+    logLevel = result.level
     if logLevel == logging.INFO:
         logging.info(message)
     elif logLevel == logging.ERROR:
@@ -146,3 +147,4 @@ def updateSendDetails(uEmail, uPassword, uServer, uPort):
 
 # Run when notipy is imported
 logging.basicConfig(filename=logFileName, level=logging.DEBUG, format='%(asctime)-15s %(levelname)-8s %(message)s')
+logEntry = namedtuple("LogEntry", ['level','msg'])
