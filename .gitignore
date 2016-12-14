@@ -1,3 +1,4 @@
 sendDetails1.txt
-notipy.pyc
+notipylib/notipy.pyc
+notipylib/__init__.pyc
 notipy.log

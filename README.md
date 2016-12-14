@@ -27,7 +27,7 @@ Optionally, you can `cp sendDetails.txt sendDetails1.txt` and fill out manually.
 
 ###Sending Emails with Notipy:
 ```
-import notipy
+import notipylib.notipy as notipy
 notipy.sendMail("to@address.com", "This is a message")
 ```
 
