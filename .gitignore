@@ -2,3 +2,5 @@ sendDetails1.txt
 notipylib/notipy.pyc
 notipylib/__init__.pyc
 notipy.log
+MANIFEST
+dist/

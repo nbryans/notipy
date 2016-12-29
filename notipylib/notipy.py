@@ -148,3 +148,6 @@ def updateSendDetails(uEmail, uPassword, uServer, uPort):
 # Run when notipy is imported
 logging.basicConfig(filename=logFileName, level=logging.DEBUG, format='%(asctime)-15s %(levelname)-8s %(message)s')
 logEntry = namedtuple("LogEntry", ['level','msg'])
+
+# BUG - When I import notipy from a place other than the parent directory, it can't find sendDetails1.txt.
+# I ONLY want this file to exist from a single place on the harddrive.
