@@ -12,7 +12,7 @@ Notipy is compatible with both python2 and python3
 # Instructions
 
 ### On First Run
-Download Notipy-1.0.zip
+Build package using `python setup.py sdist` and move dist to desired location
 Extract Notipy-1.0 from the zip
 ```
 cd Notipy-1.0

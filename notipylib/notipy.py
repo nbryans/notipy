@@ -14,7 +14,7 @@ Compatible with both python2 and python3
 """
 
 #Instructions:
-#Create file <<< sendDetails1.txt >> containing the following contents 
+#Create file <<< senddetails.dat >> containing the following contents 
 #
 #email:nbauto791@gmail.com
 #password:<redacted>
@@ -22,7 +22,7 @@ Compatible with both python2 and python3
 #port:587
 #
 #To run:
-#import notipy
+#import notipylib.notipy as notipy
 #notipy.sendMail("to@address.com", "This is a message")
 
 
@@ -43,9 +43,8 @@ required_keywords = ["email", "password", "server", "port"]
 def _readSendDetails():
     send_details = {}
 
-    # Check for sendDetails1.txt. This is included in the .gitignore
-    # file containing so it is NOT tracked by Git.
-    if detailsFileName and os.path.isfile(detailsFileName):
+    #sendDetails overridden from default by user
+    if detailsFileName and os.path.isfile(detailsFileName): 
         fin = open(detailsFileName)
     elif pkg.resource_exists('notipylib', 'data/senddetails.dat'):
         fin = open(pkg.resource_filename('notipylib', 'data/senddetails.dat'), 'r')
@@ -134,7 +133,7 @@ def queryLog(numEntry, logFile=None):
             print(i)
 
 def updateSendDetails(uEmail, uPassword, uServer, uPort):
-    if detailsFileName: # sendDetails overriden from default file in data/*.dat
+    if detailsFileName: #sendDetails overridden from default by user
         fout = open(detailsFileName, "w")
     else:
         fout = open(pkg.resource_filename('notipylib','data/senddetails.dat'), 'w')
@@ -155,3 +154,8 @@ def updateSendDetails(uEmail, uPassword, uServer, uPort):
 # Run when notipy is imported
 logging.basicConfig(filename=logFileName, level=logging.DEBUG, format='%(asctime)-15s %(levelname)-8s %(message)s')
 logEntry = namedtuple("LogEntry", ['level','msg'])
+
+# ToDo
+# Add constants to a configuration data file
+# Log to a installed directory (and not the working directory)
+# Build a better test package
