@@ -12,18 +12,25 @@ Notipy is compatible with both python2 and python3
 # Instructions
 
 ### On First Run
+Download Notipy-1.0.zip
+Extract Notipy-1.0 from the zip
 ```
-import notipy
+cd Notipy-1.0
+python setup.py install
+```
+and in a `python` session
+```
+import notipylib.notipy as notipy
 notipy.updateSendDetails("yourEmail@server.com", "yourPassword", "smtp.yourServer.com", "587")
 ```
-This will create file  `sendDetails1.txt` containing the following contents:
+This will create file  `senddetails.dat` containing the following contents:
 ```
 email:nbauto791@gmail.com
 password:<redacted>
 server:smtp.gmail.com
 port:587
 ```
-Optionally, you can `cp sendDetails.txt sendDetails1.txt` and fill out manually.
+Optionally, you can fill it out manually.
 
 ###Sending Emails with Notipy:
 ```
@@ -32,8 +39,6 @@ notipy.sendMail("to@address.com", "This is a message")
 ```
 
 # Notes
-`sendDetails1.txt` is included in `.gitignore` to keep your email details off GitHub.
-
 Use `notipy.sendMailAsync(..)` to send mail in the background asynchronously.
 
 Send statuses are logged in `notipy.log`. The file to write the log to to can be changed in the `#Constants` section of `notipy.py`

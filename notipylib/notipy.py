@@ -3,6 +3,7 @@
 import smtplib
 import os.path
 import logging
+import pkg_resources as pkg
 from multiprocessing import Pool
 from collections import deque, namedtuple
 
@@ -29,7 +30,7 @@ Compatible with both python2 and python3
 numMessageCharInLogEntry = 40
 defaultSubject = "Notipy Automail"
 logFileName = "notipy.log"
-detailsFileName = "sendDetails1.txt"
+detailsFileName = ""
 
 class MissingValueException(Exception):
     pass
@@ -44,8 +45,10 @@ def _readSendDetails():
 
     # Check for sendDetails1.txt. This is included in the .gitignore
     # file containing so it is NOT tracked by Git.
-    if os.path.isfile(detailsFileName):
+    if detailsFileName and os.path.isfile(detailsFileName):
         fin = open(detailsFileName)
+    elif pkg.resource_exists('notipylib', 'data/senddetails.dat'):
+        fin = open(pkg.resource_filename('notipylib', 'data/senddetails.dat'), 'r')
     else:
         raise MissingConfigFileException()
 
@@ -131,7 +134,11 @@ def queryLog(numEntry, logFile=None):
             print(i)
 
 def updateSendDetails(uEmail, uPassword, uServer, uPort):
-    fout = open(detailsFileName, "w")
+    if detailsFileName: # sendDetails overriden from default file in data/*.dat
+        fout = open(detailsFileName, "w")
+    else:
+        fout = open(pkg.resource_filename('notipylib','data/senddetails.dat'), 'w')
+        
     for i in required_keywords:
         value = ""
         if i == "email":
@@ -148,6 +155,3 @@ def updateSendDetails(uEmail, uPassword, uServer, uPort):
 # Run when notipy is imported
 logging.basicConfig(filename=logFileName, level=logging.DEBUG, format='%(asctime)-15s %(levelname)-8s %(message)s')
 logEntry = namedtuple("LogEntry", ['level','msg'])
-
-# BUG - When I import notipy from a place other than the parent directory, it can't find sendDetails1.txt.
-# I ONLY want this file to exist from a single place on the harddrive.
