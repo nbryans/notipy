@@ -8,5 +8,5 @@ setup(name='Notipy',
     author='Nathan Bryans',
     author_email='io@nathanbryans.ca',
     packages=['notipylib'],
-    package_data={'notipylib': ['data/*.dat']},
+    package_data={'notipylib': ['data/*.dat', 'data/*.log']},
     )

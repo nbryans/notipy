@@ -29,7 +29,7 @@ Compatible with both python2 and python3
 # Constants
 numMessageCharInLogEntry = 40
 defaultSubject = "Notipy Automail"
-logFileName = "notipy.log"
+logFileName = ""
 detailsFileName = ""
 
 class MissingValueException(Exception):
@@ -152,10 +152,11 @@ def updateSendDetails(uEmail, uPassword, uServer, uPort):
     fout.close()
 
 # Run when notipy is imported
+if not logFileName: # If the user hasn't overridden the log
+    logFileName = pkg.resource_filename('notipylib', 'data/notipy.log')
 logging.basicConfig(filename=logFileName, level=logging.DEBUG, format='%(asctime)-15s %(levelname)-8s %(message)s')
 logEntry = namedtuple("LogEntry", ['level','msg'])
 
 # ToDo
 # Add constants to a configuration data file
-# Log to a installed directory (and not the working directory)
 # Build a better test package
