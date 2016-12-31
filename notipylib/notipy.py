@@ -112,7 +112,7 @@ def _logSend(result):
         logging.error(message)
 
 def sendMail(toAddress, message, subject = ""):
-    if (subject != ""):
+    if subject:
         status = _formatAndSendMail(toAddress, message, subject)
     else:
         status = _formatAndSendMail(toAddress, message)
@@ -120,7 +120,7 @@ def sendMail(toAddress, message, subject = ""):
 
 def sendMailAsync(toAddress, message, subject = ""):
     args = [toAddress, message]
-    if (subject != ""):
+    if subject:
         args.append(subject)
     pool = Pool()
     pool.apply_async(_formatAndSendMail, args, callback=_logSend)
@@ -132,12 +132,15 @@ def queryLog(numEntry, logFile=None):
         for i in deque(fin, maxlen=numEntry):
             print(i)
 
-def updateSendDetails(uEmail, uPassword, uServer, uPort):
+def updateSendDetails(uEmail = "", uPassword = "", uServer = "", uPort = ""):
+    filename = ""
     if detailsFileName: #sendDetails overridden from default by user
-        fout = open(detailsFileName, "w")
+        filename = detailsFileName
     else:
-        fout = open(pkg.resource_filename('notipylib','data/senddetails.dat'), 'w')
-        
+        filename = pkg.resource_filename('notipylib','data/senddetails.dat')
+
+    fout = open(filename, 'w')
+
     for i in required_keywords:
         value = ""
         if i == "email":
