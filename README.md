@@ -12,13 +12,14 @@ Notipy is compatible with both python2 and python3
 # Instructions
 
 ### On First Run
-Build package using `python setup.py sdist` and move dist to desired location
+Build package using `python setup.py sdist` and move *.zip to desired location
+
 Extract Notipy-1.0 from the zip
 ```
 cd Notipy-1.0
 python setup.py install
 ```
-and in a `python` session
+In a `python` session
 ```
 import notipylib.notipy as notipy
 notipy.updateSendDetails("yourEmail@server.com", "yourPassword", "smtp.yourServer.com", "587")

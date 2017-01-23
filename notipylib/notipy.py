@@ -101,11 +101,12 @@ def _formatAndSendMail(toAddress, message, subject=defaultSubject):
         else:
             statusStr = "Successfully sent mail to " + str(toAddress) + " with message: " + message[:min(numMessageCharInLogEntry,len(message))] + "..."
 
-    return logEntry(level=logCode, msg=statusStr)
+    return [logCode, statusStr]
 
 def _logSend(result):
-    message = result.msg
-    logLevel = result.level
+    logLevel = result[0]
+    message = result[1]
+
     if logLevel == logging.INFO:
         logging.info(message)
     elif logLevel == logging.ERROR:
@@ -158,8 +159,3 @@ def updateSendDetails(uEmail = "", uPassword = "", uServer = "", uPort = ""):
 if not logFileName: # If the user hasn't overridden the log
     logFileName = pkg.resource_filename('notipylib', 'data/notipy.log')
 logging.basicConfig(filename=logFileName, level=logging.DEBUG, format='%(asctime)-15s %(levelname)-8s %(message)s')
-logEntry = namedtuple("LogEntry", ['level','msg'])
-
-# ToDo
-# Add constants to a configuration data file
-# Build a better test package
