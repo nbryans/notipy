@@ -3,6 +3,7 @@
 import smtplib
 import os.path
 import logging
+import sys
 import pkg_resources as pkg
 from multiprocessing import Pool
 from collections import deque, namedtuple
@@ -39,6 +40,7 @@ class MissingConfigFileException(Exception):
     pass
 
 required_keywords = ["email", "password", "server", "port"]
+
 
 def _readSendDetails():
     send_details = {}
@@ -126,12 +128,17 @@ def sendMailAsync(toAddress, message, subject = ""):
     pool = Pool()
     pool.apply_async(_formatAndSendMail, args, callback=_logSend)
 
-def queryLog(numEntry, logFile=None):
+def queryLog(numEntry, logFile=None, out=sys.stdout):
     if not logFile:
         logFile = logFileName
     with open(logFile) as fin:
         for i in deque(fin, maxlen=numEntry):
-            print(i)
+            out.write(i)
+
+def clearLog(logFile=None):
+    if not logFile:
+        logFile = logFileName
+    open(logFileName, 'w').close() # Clears the file
 
 def updateSendDetails(uEmail = "", uPassword = "", uServer = "", uPort = ""):
     filename = ""
@@ -154,6 +161,9 @@ def updateSendDetails(uEmail = "", uPassword = "", uServer = "", uPort = ""):
             value = uPort
         fout.write('{0}:{1}\n'.format(i, value))
     fout.close()
+
+def clearSendDetails():
+    updateSendDetails() # clears personal information from the sendDetails.dat file
 
 # Run when notipy is imported
 if not logFileName: # If the user hasn't overridden the log
