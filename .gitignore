@@ -1,5 +1,5 @@
 sendDetails1.txt
-notipylib/*.pyc
+notipymail/*.pyc
 notipy.log
 MANIFEST
 dist/

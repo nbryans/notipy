@@ -2,11 +2,16 @@
 
 from distutils.core import setup
 
-setup(name='Notipy',
-    version='1.0',
-    description='Notipy Python Email Notifier',
+setup(
+    name='notipymail',
+    packages=['notipymail'],
+    version='0.1',
+    description='Notipy Emailer',
     author='Nathan Bryans',
     author_email='io@nathanbryans.ca',
-    packages=['notipylib'],
-    package_data={'notipylib': ['data/*.dat', 'data/*.log']},
+    url = 'https://github.com/nbryans/notipymail',
+    download_url = 'https://github.com/nbryans/notipymail/tarball/0.1',
+    keywords = ['email', 'notifier', 'status'],
+    package_data={'notipymail': ['data/*.dat', 'data/*.log']},
+    classifiers = [],
     )
