@@ -69,7 +69,7 @@ def _readSendDetails():
 def _formatAndSendMail(toAddress, message, subject=defaultSubject):
     statusStr= ""
     logCode = logging.INFO
-    if isinstance(toAddress, str):   #smtolib expects the toAddress to be a string
+    if isinstance(toAddress, str):   #smtolib expects the toAddress to be a list
         toAddress = [x.strip() for x in toAddress.split(",")]
 
     try:

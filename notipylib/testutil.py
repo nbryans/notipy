@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 # This code was adapted from code written by John Montgomery
 # in his inspiring 2007 post on Monkey Patching
 # http://www.psychicorigami.com/2007/09/20/monkey-patching-pythons-smtp-lib-for-unit-testing/
