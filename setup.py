@@ -6,7 +6,7 @@ setup(
     name='notipymail',
     packages=['notipymail'],
     version='0.1',
-    description='Notipy Emailer',
+    description='A full featured Email notifier for python',
     author='Nathan Bryans',
     author_email='io@nathanbryans.ca',
     url = 'https://github.com/nbryans/notipymail',
