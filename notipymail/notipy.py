@@ -23,7 +23,7 @@ Compatible with both python2 and python3
 #port:587
 #
 #To run:
-#import notipylib.notipy as notipy
+#import notipymail.notipy as notipy
 #notipy.sendMail("to@address.com", "This is a message")
 
 
@@ -48,8 +48,8 @@ def _readSendDetails():
     #sendDetails overridden from default by user
     if detailsFileName and os.path.isfile(detailsFileName): 
         fin = open(detailsFileName)
-    elif pkg.resource_exists('notipylib', 'data/senddetails.dat'):
-        fin = open(pkg.resource_filename('notipylib', 'data/senddetails.dat'), 'r')
+    elif pkg.resource_exists('notipymail', 'data/senddetails.dat'):
+        fin = open(pkg.resource_filename('notipymail', 'data/senddetails.dat'), 'r')
     else:
         raise MissingConfigFileException()
 
@@ -145,7 +145,7 @@ def updateSendDetails(uEmail = "", uPassword = "", uServer = "", uPort = ""):
     if detailsFileName: #sendDetails overridden from default by user
         filename = detailsFileName
     else:
-        filename = pkg.resource_filename('notipylib','data/senddetails.dat')
+        filename = pkg.resource_filename('notipymail','data/senddetails.dat')
 
     fout = open(filename, 'w')
 
@@ -167,5 +167,5 @@ def clearSendDetails():
 
 # Run when notipy is imported
 if not logFileName: # If the user hasn't overridden the log
-    logFileName = pkg.resource_filename('notipylib', 'data/notipy.log')
+    logFileName = pkg.resource_filename('notipymail', 'data/notipy.log')
 logging.basicConfig(filename=logFileName, level=logging.DEBUG, format='%(asctime)-15s %(levelname)-8s %(message)s')
