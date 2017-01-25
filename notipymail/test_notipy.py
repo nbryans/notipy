@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import notipylib.notipy as notipy
+import notipymail.notipy as notipy
 import unittest
 from StringIO import StringIO # Is this still compatible with python3
 import time
@@ -22,12 +22,12 @@ class TestUpdatingVariables(unittest.TestCase):
         
     def test_updateSendDetails(self):
         notipy.updateSendDetails(self.fromAddr, self.fromPwd, self.emailSer, self.emailPort)
-        checkSendDetailsFile(self.fromAddr, self.fromPwd, self.emailSer, self.emailPort)
+        self.checkSendDetailsFile(self.fromAddr, self.fromPwd, self.emailSer, self.emailPort)
 
     def test_updateSendDetailsNonDefaultFile(self):
-        notipy.detailsFileName = alternateSendDetailsPath
+        notipy.detailsFileName = self.alternateSendDetailsPath
         notipy.updateSendDetails(self.fromAddr, self.fromPwd, self.emailSer, self.emailPort)
-        checkSendDetailsFile(self.fromAddr, self.fromPwd, self.emailSer, self.emailPort, filePath=notipy.detailsFileName)
+        self.checkSendDetailsFile(self.fromAddr, self.fromPwd, self.emailSer, self.emailPort, filePath=notipy.detailsFileName)
         # Cleanup
         notipy.detailsFileName = ""
         
@@ -37,7 +37,7 @@ class TestUpdatingVariables(unittest.TestCase):
         # Here, check that x values are correct
         
     def test_readSendDetailsNonDefaultFile(self):
-        notipy.detailsFileName = alternateSendDetailsPath
+        notipy.detailsFileName = self.alternateSendDetailsPath
         notipy.updateSendDetails(self.fromAddr, self.fromPwd, self.emailSer, self.emailPort)
         x = notipy._readSendDetails()
         # Here, check that x values are correct
@@ -63,7 +63,7 @@ class TestUpdatingVariables(unittest.TestCase):
         # Also, manually read the file to make sure NO values in it
         
     def test_clearSendDetailsNonDefaultFile(self):
-        notipy.detailsFileName = alternateSendDetailsPath
+        notipy.detailsFileName = self.alternateSendDetailsPath
         notipy.updateSendDetails(self.fromAddr, self.fromPwd, self.emailSer, self.emailPort)
         notipy.clearSendDetails()
         x = notipy._readSendDetails()
@@ -115,9 +115,13 @@ class TestSendingMail(unittest.TestCase):
         import testutil        
         notipy.updateSendDetails(self.fromAddr, self.fromPwd, self.emailSer, self.emailPort)
         
-    def checkLogEntry(self, subject=False, multRecipients=False):
+    def checkLogEntry(self, entry, subject=False, multRecipients=False):
         # This will be used to check the contents in the log and make sure they're correct
-        pass
+        self.assertTrue("Successfully sent mail to" in entry)
+        self.assertTrue("INFO" in entry)
+        self.assertTrue(self.toAddr in entry)
+        if multRecipients:
+            self.assertTrue(self.toAddr2 in entry)
     
     def test_sendMail(self):
         msg = self.msg + "test_sendMail"
@@ -125,7 +129,7 @@ class TestSendingMail(unittest.TestCase):
         out = StringIO()
         notipy.queryLog(1, out=out)
         output = out.getvalue().strip()
-        self.checkLogEntry()
+        self.checkLogEntry(output)
         notipy.clearLog()
 
     def test_sendMailWithSubj(self):
@@ -134,7 +138,7 @@ class TestSendingMail(unittest.TestCase):
         out = StringIO()
         notipy.queryLog(1, out=out)
         output = out.getvalue().strip()
-        self.checkLogEntry(subject=True)
+        self.checkLogEntry(output, subject=True)
         notipy.clearLog()
         
     def test_sendMailWithMultipleRecipients(self):
@@ -143,7 +147,7 @@ class TestSendingMail(unittest.TestCase):
         out = StringIO()
         notipy.queryLog(1, out=out)
         output=out.getvalue().strip()
-        self.checkLogEntry(multRecipients=True)
+        self.checkLogEntry(output, multRecipients=True)
         notipy.clearLog()
         
     # Unsure how to test Async function at this time since
