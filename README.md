@@ -21,7 +21,7 @@ python setup.py install
 ```
 In a `python` session
 ```
-import notipylib.notipy as notipy
+import notipymail.notipy as notipy
 notipy.updateSendDetails("yourEmail@server.com", "yourPassword", "smtp.yourServer.com", "587")
 ```
 This will create file  `senddetails.dat` containing the following contents:
@@ -35,7 +35,7 @@ Optionally, you can fill it out manually.
 
 ###Sending Emails with Notipy:
 ```
-import notipylib.notipy as notipy
+import notipymail.notipy as notipy
 notipy.sendMail("to@address.com", "This is a message")
 ```
 
