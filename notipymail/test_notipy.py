@@ -2,24 +2,77 @@
 
 import notipymail.notipy as notipy
 import unittest
-from StringIO import StringIO # Is this still compatible with python3
 import time
+import os
+try:
+    from StringIO import StringIO
+except ImportError:
+    from io import StringIO
 
-class TestUpdatingVariables(unittest.TestCase):
+class TestUpdating(unittest.TestCase):
     fromAddr = "from@here.com"
     fromPwd = "pwd"
     emailSer = "smtp.dummy.com"
     emailPort = 25
     
-    alternateSendDetailsPath = "dummy"
+    alternateSendDetailsPath = "dummy.dat"
     
-    def setUp(self):
-        pass
+    @classmethod
+    def setUpClass(self):
+        import testutil
+        self.alternateSendDetailsPath = os.getcwd()+ "\\" + self.alternateSendDetailsPath
+        self.required_keywords = notipy.required_keywords
+
+    @classmethod
+    def tearDownClass(self):
+        import smtplib
+        # Delete dummy sendDetails file
         
     def checkSendDetailsFile(self, toAddr, fromAddr, emailSer, emailPort, filePath=""):
-        # This will be used to check the raw sendDetails file to ensure it was generated correctly
-        pass
+        if filePath == "":
+            filePath = notipy.pkg.resource_filename('notipymail','data/senddetails.dat')
         
+        assert os.path.exists(filePath)
+
+        with open(filePath) as fin:
+            for line in fin:
+                x = line.split(':')
+                self.assertTrue(len(x) == 2)
+                x[0] = x[0].strip()
+                self.assertTrue(x[0] in self.required_keywords)
+                shouldEqual = ""
+                if x[0] == 'email':
+                    shouldEqual = self.fromAddr
+                elif x[0] == 'password':
+                    shouldEqual = self.fromPwd
+                elif x[0] == 'server':
+                    shouldEqual = self.emailSer
+                elif x[0] == 'port':
+                    shouldEqual = str(self.emailPort)
+                self.assertTrue(x[1].strip() == shouldEqual)
+
+    def checkReadSendDetailsDict(self, readDict):
+        for i in self.required_keywords:
+            self.assertTrue(i in readDict.keys())
+            if i == 'email':
+                shouldEqual = self.fromAddr
+            elif i == 'password':
+                shouldEqual = self.fromPwd
+            elif i == 'server':
+                shouldEqual = self.emailSer
+            elif i == 'port':
+                shouldEqual = str(self.emailPort)
+            self.assertTrue(readDict[i] == shouldEqual)
+    def checkSendDetailsClear(self, filename):
+        # Make sure we get MissingValueExceptions
+        self.assertRaises(notipy.MissingValueException, notipy._readSendDetails)
+
+        # Also, manually read the file to make sure NO values in it
+        with open(filename, 'r') as fin:
+            for line in fin:
+                x = line.rstrip().split(':')
+                self.assertTrue(len(x[1]) == 0)
+
     def test_updateSendDetails(self):
         notipy.updateSendDetails(self.fromAddr, self.fromPwd, self.emailSer, self.emailPort)
         self.checkSendDetailsFile(self.fromAddr, self.fromPwd, self.emailSer, self.emailPort)
@@ -28,49 +81,69 @@ class TestUpdatingVariables(unittest.TestCase):
         notipy.detailsFileName = self.alternateSendDetailsPath
         notipy.updateSendDetails(self.fromAddr, self.fromPwd, self.emailSer, self.emailPort)
         self.checkSendDetailsFile(self.fromAddr, self.fromPwd, self.emailSer, self.emailPort, filePath=notipy.detailsFileName)
-        # Cleanup
-        notipy.detailsFileName = ""
+        notipy.detailsFileName = "" # Cleanup
         
     def test_readSendDetails(self):
         notipy.updateSendDetails(self.fromAddr, self.fromPwd, self.emailSer, self.emailPort)
         x = notipy._readSendDetails()
-        # Here, check that x values are correct
+        self.checkReadSendDetailsDict(x)
         
     def test_readSendDetailsNonDefaultFile(self):
         notipy.detailsFileName = self.alternateSendDetailsPath
         notipy.updateSendDetails(self.fromAddr, self.fromPwd, self.emailSer, self.emailPort)
         x = notipy._readSendDetails()
-        # Here, check that x values are correct
+        self.checkReadSendDetailsDict(x)
         notipy.detailsFileName = "" # Cleanup
         
     def test_readIncompleteSendDetails(self):
-        # Force a sendDetails file (default location) with a missing value
-        # Attempt to read (using readSendDetails) and look for MissingValueException
-        pass
-        # Clean up sendDetails File
+        filePath = notipy.pkg.resource_filename('notipymail','data/senddetails.dat')
+
+        # Checking for exception with empty port value
+        with open(filePath, 'w') as fin:
+            fin.write('email:'+self.fromAddr+'\n')
+            fin.write('password:'+self.fromPwd+'\n')
+            fin.write('server:'+self.emailSer+'\n')
+            fin.write('port:\n')
+        self.assertRaises(notipy.MissingValueException, notipy._readSendDetails)
+
+        # Checking for exception with missing pwd
+        with open(filePath, 'w') as fin:
+            fin.write('email:'+self.fromAddr+'\n')
+            fin.write('server:'+self.emailSer+'\n')
+            fin.write('port:'+str(self.emailPort)+'\n')
+        self.assertRaises(notipy.MissingValueException, notipy._readSendDetails)
+
+        #Cleanup
+        notipy.updateSendDetails(self.fromAddr, self.fromPwd, self.emailSer, self.emailPort)
         
     def test_readNoSendDetails(self):
-        # Delete the sendDetails file and try reading it
-        # Look for MissingConfigFileException
-        pass
-        # Reinstate file
+        filePath = notipy.pkg.resource_filename('notipymail','data/senddetails.dat')
+
+        os.remove(filePath)
+        self.assertRaises(notipy.MissingConfigFileException, notipy._readSendDetails)
+
+        #Cleanup
+        notipy.updateSendDetails(self.fromAddr, self.fromPwd, self.emailSer, self.emailPort)
         
     def test_clearSendDetails(self):
         notipy.updateSendDetails(self.fromAddr, self.fromPwd, self.emailSer, self.emailPort)
         notipy.clearSendDetails()
-        x = notipy._readSendDetails()
-        # Make sure we get MissingValueExceptions
-        # Also, manually read the file to make sure NO values in it
-        
+
+        filePath = notipy.pkg.resource_filename('notipymail','data/senddetails.dat')
+        self.checkSendDetailsClear(filePath)
+
+        #Cleanup
+        notipy.updateSendDetails(self.fromAddr, self.fromPwd, self.emailSer, self.emailPort)
+
     def test_clearSendDetailsNonDefaultFile(self):
         notipy.detailsFileName = self.alternateSendDetailsPath
         notipy.updateSendDetails(self.fromAddr, self.fromPwd, self.emailSer, self.emailPort)
         notipy.clearSendDetails()
-        x = notipy._readSendDetails()
-        # Make sure we get MissingValueExceptions
-        # Also, manually read the file to make sure NO values in it
+
+        self.checkSendDetailsClear(notipy.detailsFileName)
+
         notipy.detailsFileName = "" # Cleanup
-        
+
     def test_logFileMissingValueException(self):
         # Make sure the log file correctly logs a MissingValueException
         # Including Error code
@@ -110,11 +183,16 @@ class TestSendingMail(unittest.TestCase):
     emailSer = "smtp.dummy.com"
     emailPort = 25
     
-    
-    def setUp(self):
+    @classmethod
+    def setUpClass(self):
         import testutil        
         notipy.updateSendDetails(self.fromAddr, self.fromPwd, self.emailSer, self.emailPort)
-        
+    
+    @classmethod
+    def tearDownClass(self):
+        import smtplib # Clear Monkey Patch on smtplib
+        notipy.clearSendDetails()
+
     def checkLogEntry(self, entry, subject=False, multRecipients=False):
         # This will be used to check the contents in the log and make sure they're correct
         self.assertTrue("Successfully sent mail to" in entry)
