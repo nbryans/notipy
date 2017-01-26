@@ -145,6 +145,13 @@ class TestUpdating(unittest.TestCase):
         notipy.detailsFileName = "" # Cleanup
 
     def test_logFileMissingValueException(self):
+        # Generate the Exception
+        filePath = notipy.pkg.resource_filename('notipymail','data/senddetails.dat')
+        # Checking for exception with missing pwd
+        with open(filePath, 'w') as fin:
+            fin.write('email:'+self.fromAddr+'\n')
+            fin.write('server:'+self.emailSer+'\n')
+            fin.write('port:'+str(self.emailPort)+'\n')
         # Make sure the log file correctly logs a MissingValueException
         # Including Error code
         pass
@@ -182,7 +189,7 @@ class TestSendingMail(unittest.TestCase):
     fromPwd = "pwd"
     emailSer = "smtp.dummy.com"
     emailPort = 25
-    
+
     @classmethod
     def setUpClass(self):
         import testutil        
