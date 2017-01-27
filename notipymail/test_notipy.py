@@ -9,14 +9,19 @@ try:
 except ImportError:
     from io import StringIO
 
-class TestUpdating(unittest.TestCase):
+class TestUpdating(unittest.TestCase): 
+    toAddr = "to@destination.com"
+    toAddr2 = "to2@destination2.com"
+    msg = "Test Message "
+    sub = "test_subject"
+
     fromAddr = "from@here.com"
     fromPwd = "pwd"
     emailSer = "smtp.dummy.com"
     emailPort = 25
-    
+
     alternateSendDetailsPath = "dummy.dat"
-    
+
     @classmethod
     def setUpClass(self):
         import testutil
@@ -27,11 +32,11 @@ class TestUpdating(unittest.TestCase):
     def tearDownClass(self):
         import smtplib
         # Delete dummy sendDetails file
-        
+
     def checkSendDetailsFile(self, toAddr, fromAddr, emailSer, emailPort, filePath=""):
         if filePath == "":
             filePath = notipy.pkg.resource_filename('notipymail','data/senddetails.dat')
-        
+
         assert os.path.exists(filePath)
 
         with open(filePath) as fin:
@@ -72,6 +77,19 @@ class TestUpdating(unittest.TestCase):
             for line in fin:
                 x = line.rstrip().split(':')
                 self.assertTrue(len(x[1]) == 0)
+    def checkLogEntry(self, entry, missValExcp=False, missConfigExcp=False, smtpExcp=False):
+        # This will be used to check the contents in the log and make sure they're correct
+        if missValExcp or missConfigExcp or smtpExcp:
+            self.assertTrue("ERROR" in entry)
+            if missValExcp:
+                self.assertTrue("file must contain a key and value" in entry)
+            elif missConfigExcp:
+                self.assertTrue("You must provide a" in entry)
+            elif smtpExcp:
+                self.assertTrue("SMTPException caught" in entry)
+
+    def checkLogMultiLine(self, entry, numLineQueried, numLineActual):
+        pass
 
     def test_updateSendDetails(self):
         notipy.updateSendDetails(self.fromAddr, self.fromPwd, self.emailSer, self.emailPort)
@@ -82,7 +100,7 @@ class TestUpdating(unittest.TestCase):
         notipy.updateSendDetails(self.fromAddr, self.fromPwd, self.emailSer, self.emailPort)
         self.checkSendDetailsFile(self.fromAddr, self.fromPwd, self.emailSer, self.emailPort, filePath=notipy.detailsFileName)
         notipy.detailsFileName = "" # Cleanup
-        
+
     def test_readSendDetails(self):
         notipy.updateSendDetails(self.fromAddr, self.fromPwd, self.emailSer, self.emailPort)
         x = notipy._readSendDetails()
@@ -94,7 +112,7 @@ class TestUpdating(unittest.TestCase):
         x = notipy._readSendDetails()
         self.checkReadSendDetailsDict(x)
         notipy.detailsFileName = "" # Cleanup
-        
+
     def test_readIncompleteSendDetails(self):
         filePath = notipy.pkg.resource_filename('notipymail','data/senddetails.dat')
 
@@ -115,7 +133,7 @@ class TestUpdating(unittest.TestCase):
 
         #Cleanup
         notipy.updateSendDetails(self.fromAddr, self.fromPwd, self.emailSer, self.emailPort)
-        
+
     def test_readNoSendDetails(self):
         filePath = notipy.pkg.resource_filename('notipymail','data/senddetails.dat')
 
@@ -124,7 +142,7 @@ class TestUpdating(unittest.TestCase):
 
         #Cleanup
         notipy.updateSendDetails(self.fromAddr, self.fromPwd, self.emailSer, self.emailPort)
-        
+
     def test_clearSendDetails(self):
         notipy.updateSendDetails(self.fromAddr, self.fromPwd, self.emailSer, self.emailPort)
         notipy.clearSendDetails()
@@ -145,6 +163,8 @@ class TestUpdating(unittest.TestCase):
         notipy.detailsFileName = "" # Cleanup
 
     def test_logFileMissingValueException(self):
+        # Ensure the log file correctly logs a MissingValueException
+
         # Generate the Exception
         filePath = notipy.pkg.resource_filename('notipymail','data/senddetails.dat')
         # Checking for exception with missing pwd
@@ -152,39 +172,78 @@ class TestUpdating(unittest.TestCase):
             fin.write('email:'+self.fromAddr+'\n')
             fin.write('server:'+self.emailSer+'\n')
             fin.write('port:'+str(self.emailPort)+'\n')
-        # Make sure the log file correctly logs a MissingValueException
-        # Including Error code
-        pass
-        
+
+        notipy.sendMail(self.toAddr, self.msg)
+        out = StringIO()
+        notipy.queryLog(1, out=out)
+        output=out.getvalue().strip()
+        self.checkLogEntry(output, missValExcp=True)
+        notipy.clearLog() # Cleanup
+
     def test_logFileMissingConfigFileException(self):
-        # Make sure the log file correctly logs a MissingConfigFileException
-        # Including Error Code
-        pass
-        
+        # Ensure the log file correctly logs a MissingConfigFileException
+
+        filePath = notipy.pkg.resource_filename('notipymail','data/senddetails.dat')
+        os.remove(filePath)
+
+        notipy.sendMail(self.toAddr, self.msg)
+
+        out = StringIO()
+        notipy.queryLog(1, out=out)
+        output=out.getvalue().strip()
+        self.checkLogEntry(output, missConfigExcp=True)
+        notipy.clearLog() # Cleanup
+
     def test_logFileSMTPException(self):
         # Make sure the log file correctly logs a SMTPException when it occurs
-        pass
-        
+
+        notipy.updateSendDetails(self.fromAddr, self.fromPwd, self.emailSer, self.emailPort)
+
+        notipy.sendMail(self.toAddr, 'raise smtpexception')
+
+        out = StringIO()
+        notipy.queryLog(1, out=out)
+        output=out.getvalue().strip()
+        self.checkLogEntry(output, smtpExcp=True)
+        notipy.clearLog()
+
+
     def test_queryLogExcess(self):
         # Make sure queryLog behaves correctly when we query more items from
         # the log than there are
-        pass
-        
+        notipy.updateSendDetails(self.fromAddr, self.fromPwd, self.emailSer, self.emailPort)
+
+        notipy.sendMail(self.toAddr, self.msg)
+        notipy.sendMail(self.toAddr, self.msg)
+
+        out = StringIO()
+        notipy.queryLog(1, out=out)
+        output=out.getvalue().strip()
+
+        notipy.checkLogMultiLine(output, 3, 2)
+
     def test_clearLog(self):
         # Make sure the log is cleared correctly
-        pass
-        
+        notipy.updateSendDetails(self.fromAddr, self.fromPwd, self.emailSer, self.emailPort)
+
+        notipy.sendMail(self.toAddr, self.msg)
+        notipy.sendMail(self.toAddr, self.msg)
+
+        notipy.clearLog()
+
+        #Verify (manually) here that the log is cleared
+
     def test_clearLogNonDefaultFile(self):
         # Make sure the log is cleared correctly when its in non-default location
         pass
-        
-        
+
+
 class TestSendingMail(unittest.TestCase):
     toAddr = "to@destination.com"
     toAddr2 = "to2@destination2.com"
     msg = "Test Message "
     sub = "test_subject"
-    
+
     fromAddr = "from@here.com"
     fromPwd = "pwd"
     emailSer = "smtp.dummy.com"
@@ -194,7 +253,7 @@ class TestSendingMail(unittest.TestCase):
     def setUpClass(self):
         import testutil        
         notipy.updateSendDetails(self.fromAddr, self.fromPwd, self.emailSer, self.emailPort)
-    
+
     @classmethod
     def tearDownClass(self):
         import smtplib # Clear Monkey Patch on smtplib
@@ -207,7 +266,7 @@ class TestSendingMail(unittest.TestCase):
         self.assertTrue(self.toAddr in entry)
         if multRecipients:
             self.assertTrue(self.toAddr2 in entry)
-    
+
     def test_sendMail(self):
         msg = self.msg + "test_sendMail"
         notipy.sendMail(self.toAddr, msg)
@@ -225,7 +284,7 @@ class TestSendingMail(unittest.TestCase):
         output = out.getvalue().strip()
         self.checkLogEntry(output, subject=True)
         notipy.clearLog()
-        
+
     def test_sendMailWithMultipleRecipients(self):
         msg = self.msg + "test_sendMailWithMultipleRecipients"
         notipy.sendMail(self.toAddr+","+self.toAddr2, msg)
@@ -234,7 +293,7 @@ class TestSendingMail(unittest.TestCase):
         output=out.getvalue().strip()
         self.checkLogEntry(output, multRecipients=True)
         notipy.clearLog()
-        
+
     # Unsure how to test Async function at this time since
     # Monkey patch on the smtplib.SMTP does not carry over to
     # spawned processes
@@ -260,6 +319,6 @@ class TestSendingMail(unittest.TestCase):
         # print(output)
         # self.checkLogEntry(subject=True)
         # notipy.clearLog()
-        
+
 if __name__ == '__main__':
     unittest.main()

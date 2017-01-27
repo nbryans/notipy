@@ -9,6 +9,7 @@ import smtplib
 smtp=None
 inbox=[]
 
+
 class Message(object):
     def __init__(self,from_address,to_address,fullmessage):
         self.from_address=from_address
@@ -30,6 +31,8 @@ class MonkeySMTP(object):
         self.password=password
 
     def sendmail(self,from_address,to_address,fullmessage):
+        if 'raise smtpexception' in fullmessage:
+            raise smtplib.SMTPException
         global inbox
         inbox.append(Message(from_address,to_address,fullmessage))
 
