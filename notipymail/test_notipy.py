@@ -89,7 +89,8 @@ class TestUpdating(unittest.TestCase):
                 self.assertTrue("SMTPException caught" in entry)
 
     def checkLogMultiLine(self, entry, numLineQueried, numLineActual):
-        pass
+        numNewLine = entry.count('\n')
+        self.assertTrue(numNewLine <= 2)
 
     def test_updateSendDetails(self):
         notipy.updateSendDetails(self.fromAddr, self.fromPwd, self.emailSer, self.emailPort)
@@ -212,15 +213,16 @@ class TestUpdating(unittest.TestCase):
         # Make sure queryLog behaves correctly when we query more items from
         # the log than there are
         notipy.updateSendDetails(self.fromAddr, self.fromPwd, self.emailSer, self.emailPort)
-
+        notipy.clearLog()
         notipy.sendMail(self.toAddr, self.msg)
         notipy.sendMail(self.toAddr, self.msg)
 
         out = StringIO()
-        notipy.queryLog(1, out=out)
+        notipy.queryLog(3, out=out)
         output=out.getvalue().strip()
 
-        notipy.checkLogMultiLine(output, 3, 2)
+        self.checkLogMultiLine(output, 3, 2)
+        notipy.clearLog()
 
     def test_clearLog(self):
         # Make sure the log is cleared correctly
@@ -232,9 +234,15 @@ class TestUpdating(unittest.TestCase):
         notipy.clearLog()
 
         #Verify (manually) here that the log is cleared
+        filePath = notipy.pkg.resource_filename('notipymail','data/notipy.log')
+        self.assertTrue(os.stat(filePath).st_size == 0)
 
     def test_clearLogNonDefaultFile(self):
         # Make sure the log is cleared correctly when its in non-default location
+        
+        # Right now, to test this I need to change file name in notipy.py
+        # and reload module. Change program behaviour to make this easier
+        # to test
         pass
 
 
