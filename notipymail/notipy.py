@@ -52,11 +52,12 @@ def _readSendDetails():
         fin = open(pkg.resource_filename('notipymail', 'data/senddetails.dat'), 'r')
     else:
         raise MissingConfigFileException()
-
+    
     for line in fin:
         lineSplit = line.rstrip().split(":")
         send_details[lineSplit[0]] = lineSplit[1]
-
+    
+    fin.close()
     # Check for required terms
     for i in required_keywords:
         if i in send_details.keys():

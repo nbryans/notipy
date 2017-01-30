@@ -33,6 +33,12 @@ class TestUpdating(unittest.TestCase):
         import smtplib
         # Delete dummy sendDetails file
 
+    def tearDown(self):
+        time.sleep(0.03)
+        # I've found that a small time delay between tests helps
+        # prevent a sporadic test error where the OS can't open the
+        # dummy.dat file in Python3
+
     def checkSendDetailsFile(self, toAddr, fromAddr, emailSer, emailPort, filePath=""):
         if filePath == "":
             filePath = notipy.pkg.resource_filename('notipymail','data/senddetails.dat')
