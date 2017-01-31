@@ -21,7 +21,7 @@ setup(
     url = 'https://github.com/nbryans/notipymail',
     download_url = 'https://github.com/nbryans/notipymail/tarball/0.1',
     license='MIT',
-     classifiers=[
+    classifiers=[
         # How mature is this project? Common values are
         #   3 - Alpha
         #   4 - Beta
@@ -45,5 +45,4 @@ setup(
     ],
     keywords = ['Email', 'Notifier', 'Status'],
     package_data={'notipymail': ['data/*.dat', 'data/*.log']},
-    classifiers = [],
     )
