@@ -6,7 +6,7 @@ https://packaging.python.org/en/latest/distributing.html
 https://github.com/pypa/sampleproject
 """
 
-from setuptools import setup
+from distutils.core import setup
 
 long_description = "NotipyMail is a small package that sends emails from python code. It was initially conceived as a way to email me the status of my runs when I left for the night, but really can be used for any basic email sending from python."
 

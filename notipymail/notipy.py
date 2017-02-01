@@ -14,14 +14,6 @@ Tool for sending email from python. It was created to notify
 Compatible with both python2 and python3
 """
 
-#Instructions:
-#Create file <<< senddetails.dat >> containing the following contents 
-#
-#email:nbauto791@gmail.com
-#password:<redacted>
-#server:smtp.gmail.com
-#port:587
-#
 #To run:
 #import notipymail.notipy as notipy
 #notipy.sendMail("to@address.com", "This is a message")
@@ -30,8 +22,8 @@ Compatible with both python2 and python3
 # Constants
 numMessageCharInLogEntry = 40
 defaultSubject = "Notipy Automail"
-logFileName = ""
-detailsFileName = ""
+logFileName = ""     # Overload at own risk
+detailsFileName = "" # Overload at own risk
 
 class MissingValueException(Exception):
     pass
@@ -70,16 +62,16 @@ def _readSendDetails():
 def _formatAndSendMail(toAddress, message, subject=defaultSubject):
     statusStr= ""
     logCode = logging.INFO
-    if isinstance(toAddress, str):   #smtolib expects the toAddress to be a list
+    if isinstance(toAddress, str):   #smtplib expects the toAddress to be a list
         toAddress = [x.strip() for x in toAddress.split(",")]
 
     try:
         send_details = _readSendDetails()
     except MissingValueException as e:
-        statusStr = "The sendDetails1.txt file must contain a key and value for key: " + str(e) + " ."
+        statusStr = "The sendDetails.dat file must contain a key and value for key: " + str(e) + " ."
         logCode = logging.ERROR
     except MissingConfigFileException as e:
-        statusStr = "You must provide a sendDetails1.txt file. See GitHub Readme for file format details."
+        statusStr = "You must provide a sendDetails.dat file. See GitHub Readme for file format details."
         logCode = logging.ERROR
     else:
         SERVER = send_details["server"]
@@ -102,7 +94,9 @@ def _formatAndSendMail(toAddress, message, subject=defaultSubject):
             statusStr = "SMTPException caught: " + str(e)
             logCode = logging.ERROR
         else:
-            statusStr = "Successfully sent mail to " + str(toAddress) + " with message: " + message[:min(numMessageCharInLogEntry,len(message))] + "..."
+            statusStr = "Successfully sent mail to " + str(toAddress) + " with message: " + message[:min(numMessageCharInLogEntry,len(message))].encode('string_escape')
+            if len(message) > numMessageCharInLogEntry:
+                statusStr += "..."
 
     return [logCode, statusStr]
 
