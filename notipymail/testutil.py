@@ -6,7 +6,7 @@
 
 # monkey-patch smtplib so we don't send actual emails
 import smtplib
-smtp=None
+
 inbox=[]
 
 
@@ -20,8 +20,6 @@ class MonkeySMTP(object):
     def __init__(self,address,port):
         self.address=address
         self.port=port
-        global smtp
-        smtp=self
         
     def starttls(self):
         pass
