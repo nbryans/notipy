@@ -98,11 +98,11 @@ def _formatAndSendMail(toAddress, message, subject=defaultSubject):
             if len(message) > numMessageCharInLogEntry:
                 statusStr += "..."
 
-    return [logCode, statusStr]
+    return {'code':logCode, 'status':statusStr}
 
 def _logSend(result):
-    logLevel = result[0]
-    message = result[1]
+    logLevel = result['code']
+    message = result['status']
 
     if logLevel == logging.INFO:
         logging.info(message)
