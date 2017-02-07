@@ -38,4 +38,5 @@ class MonkeySMTP(object):
         self.has_quit=True
 
 # this is the actual monkey patch (simply replacing one class with another)
+global smtplib
 smtplib.SMTP=MonkeySMTP

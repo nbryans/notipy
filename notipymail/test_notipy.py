@@ -320,7 +320,7 @@ class TestSendingMail(unittest.TestCase):
         # notipy.queryLog(1, out=out)
         # output = out.getvalue().strip()
         # print(output)
-        # self.checkLogEntry()
+        # self.checkLogEntry(output)
         # notipy.clearLog()
         
     # def test_sendMailAsyncWithSubj(self):
@@ -331,7 +331,7 @@ class TestSendingMail(unittest.TestCase):
         # notipy.queryLog(1, out=out)
         # output = out.getvalue().strip()
         # print(output)
-        # self.checkLogEntry(subject=True)
+        # self.checkLogEntry(output, subject=True)
         # notipy.clearLog()
 
 if __name__ == '__main__':
