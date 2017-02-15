@@ -25,6 +25,8 @@ defaultSubject = "Notipy Automail"
 logFileName = ""     # Overload at own risk
 detailsFileName = "" # Overload at own risk
 
+LogEntry = namedtuple("LogEntry", ['logLev', 'msg'])
+
 class MissingValueException(Exception):
     pass
 
@@ -98,11 +100,11 @@ def _formatAndSendMail(toAddress, message, subject=defaultSubject):
             if len(message) > numMessageCharInLogEntry:
                 statusStr += "..."
 
-    return {'code':logCode, 'status':statusStr}
+    return LogEntry(logLev=logCode, msg=statusStr)
 
 def _logSend(result):
-    logLevel = result['code']
-    message = result['status']
+    logLevel = result.logLev
+    message = result.msg
 
     if logLevel == logging.INFO:
         logging.info(message)
