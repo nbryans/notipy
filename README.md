@@ -9,6 +9,7 @@ This script was created to notify (hence, notipy :) me when a job was completed 
 Notipy is compatible with both python2 and python3
 
 <br />
+
 # Instructions
 
 ### On First Run
@@ -33,7 +34,7 @@ port:587
 ```
 Optionally, you can fill it out manually.
 
-###Sending Emails with Notipy:
+### Sending Emails with Notipy:
 ```
 import notipymail.notipy as notipy
 notipy.sendMail("to@address.com", "This is a message")
