@@ -8,12 +8,10 @@ https://github.com/pypa/sampleproject
 
 from distutils.core import setup
 
-long_description = "NotipyMail is a small package that sends emails from python code. It was initially a script to email me the status of my runs when I left for the night, but can be used for any basic email sending needs."
-
 setup(
     name='notipymail',
     packages=['notipymail'],
-    version='0.2',
+    version='0.6',
     description='A full featured email status notifier for python',
     long_description=long_description,
     author='Nathan Bryans',
@@ -45,4 +43,4 @@ setup(
     ],
     keywords = ['Email', 'Notifier', 'Status'],
     package_data={'notipymail': ['data/*.dat', 'data/*.log']},
-    )
+)
