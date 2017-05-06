@@ -8,11 +8,19 @@ https://github.com/pypa/sampleproject
 
 from distutils.core import setup
 
+try:
+    from pypandoc import convert
+    read_md = lambda f: convert(f, 'rst')
+except ImportError:
+    print("warning: pypandoc module not found, could not convert Mardown to RST")
+    read_md = lambda f: open(f, 'r').read()
+
 setup(
     name='notipymail',
     packages=['notipymail'],
     version='0.6',
     description='A full featured email status notifier for python',
+    long_description = read_md('README.md'),
     author='Nathan Bryans',
     author_email='io@nathanbryans.ca',
     url = 'https://github.com/nbryans/notipymail',

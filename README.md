@@ -49,8 +49,9 @@ To query the log through python, use `notipy.queryLog(5)` where `5` specifies th
 
 In `sendMail` and `sendMailAsync`, there is an optional third parameter where you can specify a subject. *i.e.* `notipy.sendMail("to@address.com", "This is the message", "Custom Subject")`. The default subject is "Notipy Automail"
 
-<!---
+
+### Acknowledgements
 Logo created using modified images originally distributed by Pixabay.com
 https://pixabay.com/en/cartoon-snake-yellow-1293047/
 https://pixabay.com/en/email-letter-contact-message-mail-309678/
--->
+
