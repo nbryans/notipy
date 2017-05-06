@@ -3,7 +3,7 @@
 A module for quickly sending email alerts and statuses from python programs
 
 
-This script was created to notify (hence, notipy :) me when a job was completed (and include an exit status and results, if desired)
+This script was created to notify me when a job was completed (and sometimes include an exit status and relevant results)
 
 
 Notipy is compatible with both python2 and python3
@@ -32,7 +32,7 @@ password:<redacted>
 server:smtp.gmail.com
 port:587
 ```
-Optionally, you can fill it out manually.
+Optionally, you can create this file manually.
 
 ### Sending Emails with Notipy:
 ```
@@ -43,9 +43,9 @@ notipy.sendMail("to@address.com", "This is a message")
 # Notes
 Use `notipy.sendMailAsync(..)` to send mail in the background asynchronously.
 
-Send statuses are logged in `notipy.log`. The file to write the log to to can be changed in the `#Constants` section of `notipy.py`
+Send status are logged in `notipy.log`. The log file can be changed in the `#Constants` section of `notipy.py`
 
-To query the log through python, use `notipy.queryLog(5)` where the argument specifies the number of most recent log entries to retrieve. This operation may be slow for large logs.
+To query the log through python, use `notipy.queryLog(5)` where `5` specifies the number of log entries (most recent to least) to retrieve. This operation may be slow for large logs.
 
 In `sendMail` and `sendMailAsync`, there is an optional third parameter where you can specify a subject. *i.e.* `notipy.sendMail("to@address.com", "This is the message", "Custom Subject")`. The default subject is "Notipy Automail"
 
