@@ -13,7 +13,6 @@ setup(
     packages=['notipymail'],
     version='0.6',
     description='A full featured email status notifier for python',
-    long_description=long_description,
     author='Nathan Bryans',
     author_email='io@nathanbryans.ca',
     url = 'https://github.com/nbryans/notipymail',
