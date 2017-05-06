@@ -30,7 +30,7 @@ python setup.py install
 ### On First Run
 
 In a `python` session
-```
+```python
 import notipymail.notipy as notipy
 notipy.updateSendDetails('yourEmail@emailProvider.com', 'yourPassword', 'smtp.emailProvider.com', '587')
 ```
@@ -44,7 +44,7 @@ port:587
 Optionally, you can create this file manually.
 
 ### Sending Emails with Notipy:
-```
+```python
 import notipymail.notipy as notipy
 notipy.sendMail("to@address.com", "This is a message")
 ```
