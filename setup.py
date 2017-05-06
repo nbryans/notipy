@@ -20,7 +20,7 @@ except ImportError:
 setup(
     name='notipymail',
     packages=['notipymail'],
-    version='0.75',
+    version='0.76',
     description='A full featured email status notifier for python',
     long_description = read_md('README.md'),
     author='Nathan Bryans',
@@ -51,5 +51,5 @@ setup(
         'Programming Language :: Python :: 3.5',
     ],
     keywords = ['Email', 'Notifier', 'Status'],
-    package_data={'notipymail': ['README.md', 'data/*.dat', 'data/*.log']},
+    package_data={'': ['README.md'],    'notipymail': ['data/*.dat', 'data/*.log']},
 )
