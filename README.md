@@ -1,6 +1,6 @@
 <img src=https://github.com/nbryans/notipy/blob/master/Logo/notipyLogo.png width=300px align=left>
 <!---# notipy-->
-A module for quickly sending email alerts and statuses from python programs
+A module for quickly sending email status and alerts from python programs
 
 
 This script was created to notify me when a job was completed (and sometimes include an exit status and relevant results)
@@ -12,24 +12,33 @@ Notipy is compatible with both python2 and python3
 
 # Instructions
 
-### On First Run
-*(Optional)* If building from source, run `python setup.py sdist` and move *.zip to desired location
+### Get Notipy
 
-Extract Notipy-1.0 from the zip
+From PyPi
 ```
-cd Notipy-1.0
+pip install notipymail
+```
+From Source
+```
+git clone https://github.com/nbryans/notipymail.git
+python setup.py sdist
+# Move dist\*.zip to desired location. Extract zip
+cd Notipy-X.X
 python setup.py install
 ```
+
+### On First Run
+
 In a `python` session
 ```
 import notipymail.notipy as notipy
-notipy.updateSendDetails("yourEmail@server.com", "yourPassword", "smtp.yourServer.com", "587")
+notipy.updateSendDetails('yourEmail@emailProvider.com', 'yourPassword', 'smtp.emailProvider.com', '587')
 ```
 This will create file  `senddetails.dat` containing the following contents:
 ```
-email:nbauto791@gmail.com
-password:<redacted>
-server:smtp.gmail.com
+email:email@emailProvider.com
+password:yourPassword
+server:smtp.emailProvider.com
 port:587
 ```
 Optionally, you can create this file manually.
