@@ -8,6 +8,8 @@ https://github.com/pypa/sampleproject
 
 from distutils.core import setup
 
+# Thanks to StackOverflow user Jakub Jirutka for this snippet
+# http://stackoverflow.com/questions/10718767/have-the-same-readme-both-in-markdown-and-restructuredtext
 try:
     from pypandoc import convert
     read_md = lambda f: convert(f, 'rst')
@@ -18,7 +20,7 @@ except ImportError:
 setup(
     name='notipymail',
     packages=['notipymail'],
-    version='0.6',
+    version='0.7',
     description='A full featured email status notifier for python',
     long_description = read_md('README.md'),
     author='Nathan Bryans',
